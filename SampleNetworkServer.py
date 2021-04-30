@@ -4,6 +4,79 @@ import matplotlib.animation as animation
 import infinc
 import time
 import math
+import socket
+import fcntl
+import os
+import errno
+
+class SmartNetworkThermometer (threading.Thread) :
+    cmds = ["SET_DEGF", "SET_DEGC", "SET_DEGK", "GET_TEMP", "UPDATE_TEMP"]
+    def __init__ (self, source, updatePeriod, port) :
+        threading.Thread.__init__(self, daemon = True) 
+        #set daemon to be true, so it doesn't block program from exiting
+        self.source = source
+        self.updatePeriod = updatePeriod
+        self.curTemperature = 0
+        self.updateTemperature()
+
+        self.serverSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.serverSocket.bind(("127.0.0.1", port))
+        fcntl.fcntl(self.serverSocket, fcntl.F_SETFL, os.O_NONBLOCK)
+
+        self.deg = "K"
+
+    def setSource(self, source) :
+        self.source = source
+
+    def setUpdatePeriod(self, updatePeriod) :
+        self.updatePeriod = updatePeriod 
+
+    def setDegreeUnit(self, s) :
+        self.deg = s
+        if self.deg not in ["F", "K", "C"] :
+            self.deg = "K"
+
+    def updateTemperature(self) :
+        self.curTemperature = self.source.getTemperature()
+
+    def getTemperature(self) :
+        if self.deg == "C" :
+            return self.curTemperature - 273
+        if self.deg == "F" :
+            return (self.curTemperature - 273) * 9 / 5 + 32
+
+        return self.curTemperature
+
+    def run(self) : #the running function
+        while True :
+            try :
+                msg, addr = self.serverSocket.recvfrom(1024)
+                msg = msg.decode("utf-8").strip()
+            except IOError as e :
+                if e.errno == errno.EWOULDBLOCK :
+                    #do nothing
+                    pass
+                else :
+                    #do nothing for now
+                    pass
+                msg = ""
+
+            if msg == "SET_DEGF" :
+                self.deg = "F"
+            elif msg == "SET_DEGC" :
+                self.deg = "C"
+            elif msg == "SET_DEGK" :
+                self.deg = "K"
+            elif msg == "GET_TEMP" :
+                self.serverSocket.sendto(b"%f\n" % self.getTemperature(), addr)
+            elif msg == "UPDATE_TEMP" :
+                self.updateTemperature()
+            elif msg :
+                self.serverSocket.sendto(b"Invalid Command\n", addr)
+
+            self.updateTemperature()
+            time.sleep(self.updatePeriod)
+
 
 class SimpleClient :
     def __init__(self, therm1, therm2) :
@@ -57,11 +130,13 @@ SIMULATION_STEP = .1 #in seconds
 
 #create a new instance of IncubatorSimulator
 bob = infinc.Human(mass = 8, length = 1.68, temperature = 36 + 273)
-bobThermo = infinc.SmartThermometer(bob, UPDATE_PERIOD)
+#bobThermo = infinc.SmartThermometer(bob, UPDATE_PERIOD)
+bobThermo = SmartNetworkThermometer(bob, UPDATE_PERIOD, 23456)
 bobThermo.start() #start the thread
 
 inc = infinc.Incubator(width = 1, depth=1, height = 1, temperature = 37 + 273, roomTemperature = 20 + 273)
-incThermo = infinc.SmartThermometer(inc, UPDATE_PERIOD)
+#incThermo = infinc.SmartNetworkThermometer(inc, UPDATE_PERIOD)
+incThermo = SmartNetworkThermometer(inc, UPDATE_PERIOD, 23457)
 incThermo.start() #start the thread
 
 incHeater = infinc.SmartHeater(powerOutput = 1500, setTemperature = 45 + 273, thermometer = incThermo, updatePeriod = UPDATE_PERIOD)

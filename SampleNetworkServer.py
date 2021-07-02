@@ -8,9 +8,13 @@ import socket
 import fcntl
 import os
 import errno
+import random
+import string
 
 class SmartNetworkThermometer (threading.Thread) :
-    cmds = ["SET_DEGF", "SET_DEGC", "SET_DEGK", "GET_TEMP", "UPDATE_TEMP"]
+    open_cmds = ["AUTH", "LOGOUT"]
+    prot_cmds = ["SET_DEGF", "SET_DEGC", "SET_DEGK", "GET_TEMP", "UPDATE_TEMP"]
+
     def __init__ (self, source, updatePeriod, port) :
         threading.Thread.__init__(self, daemon = True) 
         #set daemon to be true, so it doesn't block program from exiting
@@ -18,6 +22,7 @@ class SmartNetworkThermometer (threading.Thread) :
         self.updatePeriod = updatePeriod
         self.curTemperature = 0
         self.updateTemperature()
+        self.tokens = []
 
         self.serverSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.serverSocket.bind(("127.0.0.1", port))
@@ -47,11 +52,60 @@ class SmartNetworkThermometer (threading.Thread) :
 
         return self.curTemperature
 
+    def processCommands(self, msg, addr) :
+        cmds = msg.split(';')
+        for c in cmds :
+            cs = c.split(' ')
+            if len(cs) == 2 : #should be either AUTH or LOGOUT
+                if cs[0] == "AUTH":
+                    if cs[1] == "!Q#E%T&U8i6y4r2w" :
+                        self.tokens.append(''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)))
+                        self.serverSocket.sendto(self.tokens[-1].encode("utf-8"), addr)
+                        #print (self.tokens[-1])
+                elif cs[0] == "LOGOUT":
+                    if cs[1] in self.tokens :
+                        self.tokens.remove(cs[1])
+                else : #unknown command
+                    self.serverSocket.sendto(b"Invalid Command\n", addr)
+            elif c == "SET_DEGF" :
+                self.deg = "F"
+            elif c == "SET_DEGC" :
+                self.deg = "C"
+            elif c == "SET_DEGK" :
+                self.deg = "K"
+            elif c == "GET_TEMP" :
+                self.serverSocket.sendto(b"%f\n" % self.getTemperature(), addr)
+            elif c == "UPDATE_TEMP" :
+                self.updateTemperature()
+            elif c :
+                self.serverSocket.sendto(b"Invalid Command\n", addr)
+
+
     def run(self) : #the running function
-        while True :
+        while True : 
             try :
                 msg, addr = self.serverSocket.recvfrom(1024)
                 msg = msg.decode("utf-8").strip()
+                cmds = msg.split(' ')
+                if len(cmds) == 1 : # protected commands case
+                    semi = msg.find(';')
+                    if semi != -1 : #if we found the semicolon
+                        #print (msg)
+                        if msg[:semi] in self.tokens : #if its a valid token
+                            self.processCommands(msg[semi+1:], addr)
+                        else :
+                            self.serverSocket.sendto(b"Bad Token\n", addr)
+                    else :
+                            self.serverSocket.sendto(b"Bad Command\n", addr)
+                elif len(cmds) == 2 :
+                    if cmds[0] in self.open_cmds : #if its AUTH or LOGOUT
+                        self.processCommands(msg, addr) 
+                    else :
+                        self.serverSocket.sendto(b"Authenticate First\n", addr)
+                else :
+                    # otherwise bad command
+                    self.serverSocket.sendto(b"Bad Command\n", addr)
+    
             except IOError as e :
                 if e.errno == errno.EWOULDBLOCK :
                     #do nothing
@@ -61,18 +115,7 @@ class SmartNetworkThermometer (threading.Thread) :
                     pass
                 msg = ""
 
-            if msg == "SET_DEGF" :
-                self.deg = "F"
-            elif msg == "SET_DEGC" :
-                self.deg = "C"
-            elif msg == "SET_DEGK" :
-                self.deg = "K"
-            elif msg == "GET_TEMP" :
-                self.serverSocket.sendto(b"%f\n" % self.getTemperature(), addr)
-            elif msg == "UPDATE_TEMP" :
-                self.updateTemperature()
-            elif msg :
-                self.serverSocket.sendto(b"Invalid Command\n", addr)
+ 
 
             self.updateTemperature()
             time.sleep(self.updatePeriod)

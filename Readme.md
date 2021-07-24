@@ -1,5 +1,54 @@
-# Infant Incubator Model and Simulator
+# Final Project - Infant Incubator Model and Simulator
 
+Brief overview of the project and Infant Inclubator Simulator:
+
+In this assignment you will apply everything you have learned in this module on a real world application, the Infant Incubator. In this assignment you are a Security Engineer and you have been sent a Infant Incubator Simulator to secure. In the real world there are 2 types of Security Engineers, 1 who identify risks and alert developers on the vulnerablity in their code with proper documentation. The second kind who apply their knowledge on by securing the applications they are given. In this project, you are given the chance to be either one of this Security Engineer.   
+
+
+## Part 1 - Coding Assignment
+Identify at least 3 vulnerablities in the project and secure them. 
+
+### **Running the Infant Incubator** 
+To run the main code [SampleNetworkServer.py](SampleNetworkServer.py)
+
+```
+python3 SampleNetworkServer.py
+```
+
+Note: The code only runs on python 3. If you run into the error `ModuleNotFoundError: No Module named 'matplotlib'`, install matplotlib with the following command:
+```
+pip3 install matplotlib
+```
+
+**Hint: Other ways to connect to the Infant Incubator Server**
+```
+nc -u 127.0.0.1 23456
+```
+
+## Part 1 - Non-Coding Assignment
+Create a Vulnerablity report for the Infant Incubator application with the various methods you have learned to identify threats. In this report you are required to proof the existence of the vulnerablity. 
+
+E.g A threat modelling report with vulnerbalities and screenshots of a few vulnerablities found. Wireshark captures and snippets of possible vulnerable code. 
+
+
+## Part 2 - Optional
+The goal of a good Security Engineer is to ensure the security of an application. In the real world, applications are often tested with test scripts. The following are a few questions a Security Engineer would ask when writing a testcase to test the Security of their application:
+
+- "Does this application protect the confidentiaility of data?"
+- "Does this application hamper performance?"
+- "Does this application prevent actions that shoudl be allowed?"
+
+Notice that these questions are parallel to security paradigms: Security, Efficiency and Accuracy, Availability.
+
+If you can find a hypothesis where a security paradigm is not met that would mean the application is not secure. The testcases can be written in python or bash.
+
+Sample Testcase:
+```
+
+```
+
+
+## Infant Incubator Model Explained
 Cybersecurity education lacks practicality. We know the security principles. We know the importance of cryptography and building-security-in. We know the importance of an adversarial mindset (the security mindset). We know the importance of exposing assumptions (especially implicit ones). However, how many of us know how to apply these theoretical principles in the real world? How to trade off security for the other -ilities. Why build-security-in is incomplete -- we also need to plan-for-upgrades.
 
 To appreciate cybersecurity in practice, we must attempt to build a product with cybersecurity in mind. This Infant Incubator is such a product. It will be used as part of the Practical Cybersecurity series of courses that we are developing.

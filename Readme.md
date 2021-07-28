@@ -1,12 +1,31 @@
 # Final Project - Infant Incubator Model and Simulator
 
-Brief overview of the project and Infant Inclubator Simulator:
+In this assignment you will apply everything you have learned in this module on a real world application, the Infant Incubator. The Infant Incubator An incubator is designed to provide a safe, controlled 
+space for infants to live while their vital organs develop. Unlike a simple bassinet, an incubator provides an environment that can be adjusted to provide the ideal temperature as well as the perfect amount 
+of oxygen, humidity, and light. This paticular Infant Incubator is set to release on 18th August. The developers of this project would like you, the Security Engineer, to ensure the product satisify US Government's security regulations for medical devices. As a Security Engineer, you are required to perform Threat Modeling, Risk Assesment or Examine Security Controls to "Make sure we satisfiy US Government Regulations". 
 
-In this assignment you will apply everything you have learned in this module on a real world application, the Infant Incubator. In this assignment you are a Security Engineer and you have been sent a Infant Incubator Simulator to secure. In the real world there are 2 types of Security Engineers, 1 who identify risks and alert developers on the vulnerablity in their code with proper documentation. The second kind who apply their knowledge on by securing the applications they are given. In this project, you are given the chance to be either one of this Security Engineer.   
-
+The final deliverables for this project could be either one of these:
 
 ## Part 1 - Coding Assignment
-Identify at least 3 vulnerablities in the project and secure them. 
+
+**Part 1.1 - Identify Vulnerabilities and Testcases**
+The goal of a good Security Engineer is to ensure the security of an application. In this assignment you will identify security vulnerabilities in the project, write testcases to .
+In the real world, applications are often tested with test scripts. The following are a few questions a Security Engineer would ask when writing a testcase to test the Security of their application:
+
+- "Does this application protect the confidentiaility of data?"
+- "Does this application hamper performance?"
+- "Does this application prevent actions that shoudl be allowed?"
+
+Notice that these questions are parallel to security paradigms: Security, Efficiency and Accuracy, Availability. If you can find a hypothesis where a security paradigm is not met that would mean the application is not secure. The testcases can be written in python or bash.
+
+
+Sample Testcase (Will be shared later today):
+```
+
+```
+
+**Part 1.2 - Fix the vulnerabilities**
+For each of the vulnerabilies you have identified in Part 1.1, fix the vulnerability to ensure they are no longer exploitable.
 
 ### **Running the Infant Incubator** 
 To run the main code [SampleNetworkServer.py](SampleNetworkServer.py)
@@ -26,26 +45,12 @@ nc -u 127.0.0.1 23456
 ```
 
 ## Part 1 - Non-Coding Assignment
-Create a Vulnerablity report for the Infant Incubator application with the various methods you have learned to identify threats. In this report you are required to proof the existence of the vulnerablity. 
+As a Security Engineer, write a detailed Risk Analysis Report for the Infant Incubator application. This report should contain details on the vulerabilies and how they do not satisify the US Government Regulations(Refer to resources provide below). To identify this vulnerabilies you are encouraged to use tools you have learned in this course such as Threat Modelling and Risk Assesment.
 
-E.g A threat modelling report with vulnerbalities and screenshots of a few vulnerablities found. Wireshark captures and snippets of possible vulnerable code. 
+Resources:
+Software as a Medical Device (SAMD): Clinical Evaluation  Guidance for Industry and  Food and Drug Administration Staff - https://www.fda.gov/media/100714/download
+Pre-Market Considerations for Medical Device Cybersecurity - http://www.imdrf.org/docs/imdrf/final/technical/imdrf-tech-200318-pp-mdc-n60.pdf
 
-
-## Part 2 - Optional
-The goal of a good Security Engineer is to ensure the security of an application. In the real world, applications are often tested with test scripts. The following are a few questions a Security Engineer would ask when writing a testcase to test the Security of their application:
-
-- "Does this application protect the confidentiaility of data?"
-- "Does this application hamper performance?"
-- "Does this application prevent actions that shoudl be allowed?"
-
-Notice that these questions are parallel to security paradigms: Security, Efficiency and Accuracy, Availability.
-
-If you can find a hypothesis where a security paradigm is not met that would mean the application is not secure. The testcases can be written in python or bash.
-
-Sample Testcase:
-```
-
-```
 
 
 ## Infant Incubator Model Explained

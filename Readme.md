@@ -1,23 +1,21 @@
 # Final Project - Infant Incubator Model and Simulator
 
-In this assignment you will apply everything you have learned in this module on a real world application, the Infant Incubator. The Infant Incubator An incubator is designed to provide a safe, controlled 
+In this assignment you will apply everything you have learned in this module on a real world application, the Infant Incubator. The Infant Incubator is designed to provide a safe, controlled 
 space for infants to live while their vital organs develop. Unlike a simple bassinet, an incubator provides an environment that can be adjusted to provide the ideal temperature as well as the perfect amount 
-of oxygen, humidity, and light. This paticular Infant Incubator is set to release on 18th August. The developers of this project would like you, the Security Engineer, to ensure the product satisify US Government's security regulations for medical devices. As a Security Engineer, you are required to perform Threat Modeling, Risk Assesment or Examine Security Controls to "Make sure we satisfiy US Government Regulations". 
+of oxygen, humidity, and light. This paticular Infant Incubator is set to release on 18th August(Deadline of the Project). The developers of this project would like you, the Security Engineer, to ensure the product satisify US Government's security regulations for medical devices. As a Security Engineer, you are required **"Make sure we satisfiy US Government Regulations"**. The company has given you the options of accomplishing this by either implementing Vulnerability Patching or creating a Risk Analysis Report.
 
 The final deliverables for this project could be either one of these:
 
-## Part 1 - Coding Assignment
+## Option 1 - Vulnerability Patching
 
 **Part 1.1 - Identify Vulnerabilities and Testcases**
-The goal of a good Security Engineer is to ensure the security of an application. In this assignment you will identify security vulnerabilities in the project, write testcases to .
-In the real world, applications are often tested with test scripts. The following are a few questions a Security Engineer would ask when writing a testcase to test the Security of their application:
+Your first goal as a Security Engineer who wants to ensure the security of the application is to identify security vulnerabilities in the project and create testcases to exploit them. In the real world, applications are often tested with test scripts. The following are a few questions a Security Engineer would ask when writing a testcase to test the Security of their application:
 
 - "Does this application protect the confidentiaility of data?"
 - "Does this application hamper performance?"
 - "Does this application prevent actions that shoudl be allowed?"
 
-Notice that these questions are parallel to security paradigms: Security, Efficiency and Accuracy, Availability. If you can find a hypothesis where a security paradigm is not met that would mean the application is not secure. The testcases can be written in python or bash.
-
+Notice that these questions are parallel to security paradigms: Security, Efficiency and Accuracy, Availability. If you can find a hypothesis where a security paradigm is not met that would mean the application is not secure and a possible exploit exist. The testcases can be written in python or bash.
 
 Sample Testcase (Will be shared later today):
 ```
@@ -44,8 +42,8 @@ pip3 install matplotlib
 nc -u 127.0.0.1 23456
 ```
 
-## Part 1 - Non-Coding Assignment
-As a Security Engineer, write a detailed Risk Analysis Report for the Infant Incubator application. This report should contain details on the vulerabilies and how they do not satisify the US Government Regulations(Refer to resources provide below). To identify this vulnerabilies you are encouraged to use tools you have learned in this course such as Threat Modelling and Risk Assesment.
+## Option 2 - Risk Analysis Report
+As a Security Engineer, write a detailed Risk Analysis Report for the Infant Incubator application. This report should contain details on the vulnerabilities and how they do not satisify the US Government Regulations(Refer to resources provide below). To identify this vulnerabilies you are encouraged to use tools you have learned in this course such as Threat Modelling and Risk Assesment.
 
 Resources:
 Software as a Medical Device (SAMD): Clinical Evaluation  Guidance for Industry and  Food and Drug Administration Staff - https://www.fda.gov/media/100714/download

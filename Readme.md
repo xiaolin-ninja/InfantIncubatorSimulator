@@ -48,7 +48,9 @@ nc -u 127.0.0.1 23456
 As a Security Engineer, write a detailed Risk Analysis Report for the Infant Incubator application. This report should contain details on the vulnerabilities and how they do not satisify the US Government Regulations(Refer to resources provide below). To identify this vulnerabilies you are encouraged to use tools you have learned in this course such as Threat Modelling and Risk Assesment.
 
 Resources:
+
 Software as a Medical Device (SAMD): Clinical Evaluation  Guidance for Industry and  Food and Drug Administration Staff - https://www.fda.gov/media/100714/download
+
 Pre-Market Considerations for Medical Device Cybersecurity - http://www.imdrf.org/docs/imdrf/final/technical/imdrf-tech-200318-pp-mdc-n60.pdf
 
 

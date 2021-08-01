@@ -20,7 +20,20 @@ Notice that these questions are parallel to security paradigms: Security, Effici
 
 Sample Testcase (Will be shared later today):
 ```
+#Vulnerability Name - Eg. Hardcoded password
+import socket
 
+def authenticate(p, pw) :
+    s = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+    s.sendto(b"AUTH %s" % pw, ("127.0.0.1", p))
+    msg, addr = s.recvfrom(1024)
+    return msg.strip()
+
+#23456, 23457
+infPort = 23456
+incPort = 23457
+incToken = authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
+print (incToken)
 ```
 
 **Part 1.2 - Fix the vulnerabilities**

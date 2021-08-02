@@ -6,6 +6,8 @@ of oxygen, humidity, and light. This paticular Infant Incubator is set to releas
 
 The final deliverables for this project could be either one of these:
 
+**Note: You are allowed to do this project individually or with another Security Engineer**
+
 ## Option 1 - Vulnerability Patching
 
 **Part 1.1 - Identify Vulnerabilities and Testcases**
@@ -65,6 +67,15 @@ Hint: Other ways to connect to the Infant Incubator Server
 nc -u 127.0.0.1 23456
 ```
 
+**What to Submit**
+On NYU Classes, submit a link to your GitHub repository.
+
+The repository should contain:
+- Your testcases for Part1
+- Updated code with your vulnerability patches. Please indicate which vulnerability you are fixing in the code.
+- A Vulnerability.txt file that contains a short description on the testcases and attacks.
+
+
 ## Option 2 - Risk Analysis Report
 As a Security Engineer, write a detailed Risk Analysis Report for the Infant Incubator application. This report should contain details on the vulnerabilities and how they do not satisify the US Government Regulations(Refer to resources provide below). To identify this vulnerabilies you are encouraged to use tools you have learned in this course such as Threat Modelling and Risk Assesment.
 
@@ -74,6 +85,8 @@ Software as a Medical Device (SAMD): Clinical Evaluation  Guidance for Industry 
 
 Pre-Market Considerations for Medical Device Cybersecurity - http://www.imdrf.org/docs/imdrf/final/technical/imdrf-tech-200318-pp-mdc-n60.pdf
 
+**What to Submit**
+On NYU Classes, submit your detailed risk analysis report.
 
 
 ## Infant Incubator Model Explained

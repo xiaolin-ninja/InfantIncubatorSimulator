@@ -87,6 +87,7 @@ Software as a Medical Device (SAMD): Clinical Evaluation  Guidance for Industry 
 Pre-Market Considerations for Medical Device Cybersecurity - http://www.imdrf.org/docs/imdrf/final/technical/imdrf-tech-200318-pp-mdc-n60.pdf
 
 **What to Submit**
+
 On NYU Classes, submit your detailed risk analysis report.
 
 

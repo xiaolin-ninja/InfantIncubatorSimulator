@@ -4,9 +4,9 @@ In this assignment you will apply everything you have learned in this module on 
 space for infants to live while their vital organs develop. Unlike a simple bassinet, an incubator provides an environment that can be adjusted to provide the ideal temperature as well as the perfect amount 
 of oxygen, humidity, and light. This paticular Infant Incubator is set to release on 18th August(Deadline of the Project). The developers of this project would like you, the Security Engineer, to ensure the product satisify US Government's security regulations for medical devices before the release date. As a Security Engineer, you are required **"Make sure we satisfiy US Government Regulations"**. The company has given you the options of accomplishing this by either implementing Vulnerability Patching or creating a Risk Analysis Report.
 
-The final deliverables for this project could be either one of these:
-
 **Note: You are allowed to do this project individually or with another Security Engineer**
+
+The final deliverables for this project could be either one of these:
 
 ## Option 1 - Vulnerability Patching
 

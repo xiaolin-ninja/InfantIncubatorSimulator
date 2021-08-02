@@ -36,7 +36,7 @@ try:
     incPort = 23457
     incToken = authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
 
-    # SampleNetworkServer has authentication so the testcase, so this assertion would be true.
+    # SampleNetworkServer has authentication so the testcase will exit at this assertion.
     assert(incToken != None)
 except Exception as ex:
     print (ex)

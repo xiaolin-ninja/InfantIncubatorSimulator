@@ -62,9 +62,18 @@ Note: The code only runs on python 3. If you run into the error `ModuleNotFoundE
 pip3 install matplotlib
 ```
 
-Hint: Other ways to connect to the Infant Incubator Server
+Hint: 
 ```
+#Other ways to connect to the Infant Incubator Server
 nc -u 127.0.0.1 23456
+
+#Authenticating with the Server. This should return you a AUTH_TOKEN
+AUTH !Q#E%T&U8i6y4r2w
+
+#Running commands with the Server
+AUTH_TOKEN;SET_DEGF
+or
+AUTH_TOKEN;SET_DEGK
 ```
 
 **What to Submit**

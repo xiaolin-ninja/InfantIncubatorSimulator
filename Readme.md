@@ -20,7 +20,8 @@ Notice that these questions are parallel to security paradigms: Security, Effici
 
 Sample Testcase (Will be shared later today):
 ```
-#Vulnerability Name - Eg. Hardcoded password
+#This is just an example of a testcase
+#Vulnerability Name - Authentication available
 import socket
 
 def authenticate(p, pw) :
@@ -29,11 +30,18 @@ def authenticate(p, pw) :
     msg, addr = s.recvfrom(1024)
     return msg.strip()
 
-#23456, 23457
-infPort = 23456
-incPort = 23457
-incToken = authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
-print (incToken)
+try:
+    
+    infPort = 23456
+    incPort = 23457
+    incToken = authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
+
+    # SampleNetworkServer has authentication so the testcase, so this assertion would be true.
+    assert(incToken != None)
+except Exception as ex:
+    print (ex)
+    assert(1 == 2)
+
 ```
 
 **Part 1.2 - Fix the vulnerabilities**

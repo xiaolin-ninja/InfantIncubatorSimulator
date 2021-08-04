@@ -61,7 +61,7 @@ class SmartNetworkThermometer (threading.Thread) :
                     if cs[1] == "!Q#E%T&U8i6y4r2w" :
                         self.tokens.append(''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)))
                         self.serverSocket.sendto(self.tokens[-1].encode("utf-8"), addr)
-                        #print (self.tokens[-1])
+                        print (self.tokens[-1])
                 elif cs[0] == "LOGOUT":
                     if cs[1] in self.tokens :
                         self.tokens.remove(cs[1])
@@ -87,7 +87,9 @@ class SmartNetworkThermometer (threading.Thread) :
                 msg, addr = self.serverSocket.recvfrom(1024)
                 msg = msg.decode("utf-8").strip()
                 cmds = msg.split(' ')
+                print(cmds)
                 if len(cmds) == 1 : # protected commands case
+                    print("len(cmds) == 1")
                     semi = msg.find(';')
                     if semi != -1 : #if we found the semicolon
                         #print (msg)
@@ -98,6 +100,7 @@ class SmartNetworkThermometer (threading.Thread) :
                     else :
                             self.serverSocket.sendto(b"Bad Command\n", addr)
                 elif len(cmds) == 2 :
+                    print("len(cmds) == 2")
                     if cmds[0] in self.open_cmds : #if its AUTH or LOGOUT
                         self.processCommands(msg, addr) 
                     else :
@@ -154,15 +157,15 @@ class SimpleClient :
 
     def updateInfTemp(self, frame) :
         self.updateTime()
-        self.infTemps.append(self.infTherm.getTemperature()-273)
-        #self.infTemps.append(self.infTemps[-1] + 1)
+        self.infTemps.append(self.infTherm.curTemperature-273)
+        # self.infTemps.append(self.infTemps[-1] + 1)
         self.infTemps = self.infTemps[-30:]
         self.infLn.set_data(range(30), self.infTemps)
         return self.infLn,
 
     def updateIncTemp(self, frame) :
         self.updateTime()
-        self.incTemps.append(self.incTherm.getTemperature()-273)
+        self.incTemps.append(self.incTherm.curTemperature-273)
         #self.incTemps.append(self.incTemps[-1] + 1)
         self.incTemps = self.incTemps[-30:]
         self.incLn.set_data(range(30), self.incTemps)

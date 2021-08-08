@@ -49,25 +49,12 @@ class SmartNetworkThermometer (threading.Thread) :
             return self.curTemperature - 273
         if self.deg == "F" :
             return (self.curTemperature - 273) * 9 / 5 + 32
-
         return self.curTemperature
 
-    def processCommands(self, msg, addr) :
-        cmds = msg.split(';')
+    def processCommands(self, cmds, addr) :
+        print("hi I made it here")
         for c in cmds :
-            cs = c.split(' ')
-            if len(cs) == 2 : #should be either AUTH or LOGOUT
-                if cs[0] == "AUTH":
-                    if cs[1] == "!Q#E%T&U8i6y4r2w" :
-                        self.tokens.append(''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)))
-                        self.serverSocket.sendto(self.tokens[-1].encode("utf-8"), addr)
-                        print (self.tokens[-1])
-                elif cs[0] == "LOGOUT":
-                    if cs[1] in self.tokens :
-                        self.tokens.remove(cs[1])
-                else : #unknown command
-                    self.serverSocket.sendto(b"Invalid Command\n", addr)
-            elif c == "SET_DEGF" :
+            if c == "SET_DEGF" :
                 self.deg = "F"
             elif c == "SET_DEGC" :
                 self.deg = "C"
@@ -80,34 +67,68 @@ class SmartNetworkThermometer (threading.Thread) :
             elif c :
                 self.serverSocket.sendto(b"Invalid Command\n", addr)
 
+    def processOpenCommand(self, cs, addr): #process AUTH and LOGOUT commands
+        if cs[0] == "AUTH":
+            if cs[1] == "!Q#E%T&U8i6y4r2w" :
+                self.tokens.append(''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)))
+                self.serverSocket.sendto(self.tokens[-1].encode("utf-8"), addr)
+                print (self.tokens[-1])
+            else:
+                self.serverSocket.sendto(b"Invalid Key\n", addr)
+        elif cs[0] == "LOGOUT":
+            if cs[1] in self.tokens :
+                try:
+                    self.tokens.remove(cs[1])
+                    print("Success")
+                except:
+                    pass
+        else : #unknown command
+            self.serverSocket.sendto(b"Invalid Command\n", addr)
+
 
     def run(self) : #the running function
         while True : 
             try :
                 msg, addr = self.serverSocket.recvfrom(1024)
                 msg = msg.decode("utf-8").strip()
-                cmds = msg.split(' ')
-                print(cmds)
-                if len(cmds) == 1 : # protected commands case
-                    print("len(cmds) == 1")
-                    semi = msg.find(';')
-                    if semi != -1 : #if we found the semicolon
-                        #print (msg)
-                        if msg[:semi] in self.tokens : #if its a valid token
-                            self.processCommands(msg[semi+1:], addr)
-                        else :
-                            self.serverSocket.sendto(b"Bad Token\n", addr)
-                    else :
-                            self.serverSocket.sendto(b"Bad Command\n", addr)
-                elif len(cmds) == 2 :
-                    print("len(cmds) == 2")
-                    if cmds[0] in self.open_cmds : #if its AUTH or LOGOUT
-                        self.processCommands(msg, addr) 
-                    else :
+
+                if ' ' in msg: #expect an AUTH or LOGOUT command
+                    cmd = msg.split(' ')
+                    if len(cmd) != 2: #if command is unexpected
+                        self.serverSocket.sendto(b"Bad Command\n", addr)
+                    else:
+                        self.processOpenCommand(cmd, addr)
+                elif ';' in msg: #expect AUTH_TOKEN;chain;commands
+                    cmds = msg.split(';')
+                    print(cmds)
+
+                    if len(self.tokens) == 0: #if no authentications
                         self.serverSocket.sendto(b"Authenticate First\n", addr)
-                else :
-                    # otherwise bad command
+                    elif cmds[0] in self.tokens: #if valid token
+                        self.processCommands(cmds[1:], addr)
+                    else:
+                        self.serverSocket.sendto(b"Bad Token\n", addr)
+                else:
                     self.serverSocket.sendto(b"Bad Command\n", addr)
+
+
+                # if len(cmds) == 1 : # protected commands case
+                #     semi = msg.find(';')
+                #     if semi != -1 : #if we found the semicolon
+                #         if msg[:semi] in self.tokens : #if its a valid token
+                #             self.processCommands(msg[semi+1:], addr)
+                #         else :
+                #             self.serverSocket.sendto(b"Bad Token\n", addr)
+                #     else :
+                #             self.serverSocket.sendto(b"Bad Command\n", addr)
+                # elif len(cmds) == 2 :
+                #     if cmds[0] in self.open_cmds : #if its AUTH or LOGOUT
+                #         self.processCommands(msg, addr) 
+                #     else :
+                #         self.serverSocket.sendto(b"Authenticate First\n", addr)
+                # else :
+                #     # otherwise bad command
+                #     self.serverSocket.sendto(b"Bad Command\n", addr)
     
             except IOError as e :
                 if e.errno == errno.EWOULDBLOCK :
@@ -117,7 +138,6 @@ class SmartNetworkThermometer (threading.Thread) :
                     #do nothing for now
                     pass
                 msg = ""
-
  
 
             self.updateTemperature()
@@ -157,7 +177,8 @@ class SimpleClient :
 
     def updateInfTemp(self, frame) :
         self.updateTime()
-        self.infTemps.append(self.infTherm.curTemperature-273)
+        t = self.convertTemperature(self.infTherm)
+        self.infTemps.append(t)
         # self.infTemps.append(self.infTemps[-1] + 1)
         self.infTemps = self.infTemps[-30:]
         self.infLn.set_data(range(30), self.infTemps)
@@ -165,11 +186,24 @@ class SimpleClient :
 
     def updateIncTemp(self, frame) :
         self.updateTime()
-        self.incTemps.append(self.incTherm.curTemperature-273)
+        t = self.convertTemperature(self.incTherm)
+        self.incTemps.append(t)
         #self.incTemps.append(self.incTemps[-1] + 1)
         self.incTemps = self.incTemps[-30:]
         self.incLn.set_data(range(30), self.incTemps)
         return self.incLn,
+
+    def convertTemperature(self, therm):
+        temp = therm.getTemperature()
+        if therm.deg == "C" :
+            return temp
+        if therm.deg == "F" :
+            print("I MADE IT HERE!")
+            print((temp - 32) * 5 / 9)
+            return (temp - 32) * 5 / 9
+        if therm.deg == "K" :
+            return temp - 273
+
 
 UPDATE_PERIOD = .05 #in seconds
 SIMULATION_STEP = .1 #in seconds
@@ -197,4 +231,3 @@ sc = SimpleClient(bobThermo, incThermo)
 
 plt.grid()
 plt.show()
-

@@ -4,6 +4,7 @@ import socket
 infPort = 23456
 incPort = 23457
 server = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+error_messages = [b"Authenticate First", b"Bad Command", b"Bad Token", b"Invalid Key", b"Invalid Command"]
 
 def authenticate(p, pw) :
     server.sendto(b"AUTH %s" % pw, ("127.0.0.1", p))
@@ -15,61 +16,87 @@ def send_command(cmd, p):
     msg, addr = server.recvfrom(1024)
     return msg.strip()
 
-# -------------------------------------------------------- #
+# ------------------------ EXPLOITS -------------------------- #
 
-# Test cannot run commands without authenticating
+"""
+BUG I: can run commands without authenticating
+"""
 
-# try:
-#     resp = send_command(b"GET_TEMP potato", infPort)
-#     assert(resp == b"Authenticate First")
-# except Exception as x:
-#     print(x)
-#     assert(1==2)
+# tests command chaining does not work with AUTH or LOGOUT
 
-# Test command works with auth key
 try:
-    resp = send_command(b"GET_TEMP;!Q#E%T&U8i6y4r2w", infPort)
-    print(resp)
-    assert(resp == b"Authenticate First")
+    resp = send_command(b"AUTH foo;GET_TEMP", incPort)
+    assert(resp in error_messages) # test should fail because of bug
 except Exception as x:
     print(x)
     assert(1==2)
 
+try:
+    resp = send_command(b"LOGOUT bar;GET_TEMP", incPort)
+    assert(resp in error_messages) # test should fail because of bug
+except Exception as x:
+    print(x)
+    assert(1==2)
+
+try:
+    token = authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
+    resp = send_command(b"%s;GET_TEMP;LOGOUT %s" % token, token, incPort)
+    assert(resp in error_messages)
+except Exception as x:
+    print(x)
+    assert(1==2)
+
+
+"""
+BUG II : setting temperature to C or F breaks temperature calculations in the Incubator temperature,
+and makes the temperature line disappear in client.
+(It does not cause the same inconsistency with the Infant temperature)
+"""
+
+# See Vulnerability.txt for explanation of this bug and fix.
+
+
+"""
+BUG III: race condition
+"""
+
+# See Vulnerability.txt for explanation of this bug and fix.
+
+# ------------------------- TESTS ---------------------------- #
+
 # Test authentication works
 
-# try:
-#     authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
-#     assert(incToken != None)
-#     except Exception as ex:
-#         print(ex)
-#         assert(1==2)
+try:
+    token = authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
+    assert(token != None)
+except Exception as x:
+    print(x)
+    assert(1==2)
 
-# Test once authenticated, commands work
+# Test command works with auth key
+try:
+    token = authenticate(infPort, b"!Q#E%T&U8i6y4r2w")
+    resp = send_command(b"%s;GET_TEMP" % token, infPort)
+    assert(resp not in error_messages)
+except Exception as x:
+    print(x)
+    assert(1==2)
 
+# Test command chaining works with auth key
+try:
+    token = authenticate(infPort, b"!Q#E%T&U8i6y4r2w")
+    resp = send_command(b"%s;SET_DEGC;GET_TEMP" % token, infPort)
+    assert(resp not in error_messages)
+except Exception as x:
+    print(x)
+    assert(1==2)
 
-
-# def set_temperature(p, pw)
-
-# test SampleNetworkServer has authentication
-# try:
-#     infPort = 23456
-#     incPort = 23457
-#     incToken = authenticate(incPort, b"!Q#E%T&U8i6y4r2w")
-#     assert(incToken != None)
-# except Exception as ex:
-#     print(ex)
-#     assert(1==2)
-
-
-# # Blank message
-# try:
-#     infPort = 23456
-#     incPort = 23457
-#     s = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-#     s.sendto(b";", ("127.0.0.1", 23457))
-
-#     # incToken = authenticate(incPort, b"potato")
-#     # assert(incToken != None)
-# except Exception as ex:
-#     print(ex)
-#     assert(1==2)
+# Test commands no longer work after logout
+try:
+    token = authenticate(infPort, b"!Q#E%T&U8i6y4r2w")
+    send_command(b"LOGOUT %s" % token, infPort)
+    resp = send_command(b"%s;GET_TEMP" % token, infPort)
+    assert(resp in error_messages)
+except Exception as x:
+    print(x)
+    assert(1==2)

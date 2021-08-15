@@ -1,9 +1,11 @@
 import socket
 import ssl
+import os
+from dotenv import load_dotenv
 
 infPort = 23456
 incPort = 23457
-secret_key = os.environ.get('SECRET_KEY').encode('utf-8')
+secret_key = b'!Q#E%T&U8i6y4r2w'
 server = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 error_messages = [b"Authenticate First", b"Bad Command", b"Bad Token", b"Invalid Key", b"Invalid Command"]
 

@@ -184,8 +184,8 @@ This class represents the incubator / chamber
 '''
 class Incubator :
 
-    DENSITY = 1.2041       # UNIT: kg / m**3
-    SPECIFIC_HEAT = 1012   # UNIT: J / kg / degK
+    DENSITY = 1204.1       # UNIT: kg / m**3
+    SPECIFIC_HEAT = 3500    # UNIT: J / kg / degK
     THERMAL_TRANSFER = 5.1 # UNIT: J / s / m**2 / degK
 
     def __init__ (self, width, depth, height, temperature, roomTemperature) :
@@ -239,11 +239,11 @@ class Incubator :
         self.infant = newInfant
 
         #First, lets calculate the displacement in volume so we can update energy
-        airVolume = self.volume - self.infant.volume
+        self.volume = self.volume - self.infant.volume
 
         #now update the energy content based on the current temperature
-        airMass = Incubator.DENSITY * airVolume
-        energy = Incubator.SPECIFIC_HEAT * airMass * self.temperature
+        self.mass = Incubator.DENSITY * self.volume
+        self.energy = Incubator.SPECIFIC_HEAT * self.mass * self.temperature
         
     def closeIncubator(self) :
         pass #nothing to do here for the simulation

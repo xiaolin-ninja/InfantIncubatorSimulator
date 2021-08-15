@@ -14,6 +14,13 @@ xx910
 
 `AUTH='!Q#E%T&U8i6y4r2w'`
 
+### Generate Certificates:
+
+```
+openssl req -out infinc.csr -new -newkey rsa:2048 -nodes -keyout private.key
+openssl x509 -signkey private.key -in infinc.csr -req -days 365 -out infinc.crt
+```
+
 ### Running tests locally
 
 Test cases 1 - 5 are run with `python Tests.py`, after starting `SampleNetworkServer.py`, and `SampleNetworkClient.py`

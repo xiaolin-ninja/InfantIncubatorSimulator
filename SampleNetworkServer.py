@@ -11,7 +11,7 @@ import errno
 import random
 import string
 
-class SmartNetworkThermometer (threading.Thread) :
+class SmartNetworkThermometer (threading.Thread):
     open_cmds = ["AUTH", "LOGOUT"]
     prot_cmds = ["SET_DEGF", "SET_DEGC", "SET_DEGK", "GET_TEMP", "UPDATE_TEMP"]
 
@@ -30,44 +30,50 @@ class SmartNetworkThermometer (threading.Thread) :
 
         self.deg = "K"
 
-    def setSource(self, source) :
+    def setSource(self, source):
         self.source = source
 
-    def setUpdatePeriod(self, updatePeriod) :
+    def setUpdatePeriod(self, updatePeriod):
         self.updatePeriod = updatePeriod 
 
-    def setDegreeUnit(self, s) :
+    def setDegreeUnit(self, s):
         self.deg = s
         if self.deg not in ["F", "K", "C"] :
             self.deg = "K"
 
-    def updateTemperature(self) :
+    def updateTemperature(self):
         self.curTemperature = self.source.getTemperature()
 
-    def getTemperature(self) :
-        if self.deg == "C" :
+    def getTemperature(self):
+        if self.deg == "C":
             return self.curTemperature - 273
-        if self.deg == "F" :
+        if self.deg == "F":
             return (self.curTemperature - 273) * 9 / 5 + 32
         return self.curTemperature
 
-    def processCommands(self, cmds, addr) :
-        print("hi I made it here")
-        for c in cmds :
-            if c == "SET_DEGF" :
+    def processCommands(self, token, cmds, addr):
+        for c in cmds:
+            if c == "LOGOUT":
+                if token in self.tokens:
+                    try:
+                        self.tokens.remove(token)
+                        self.serverSocket.sendto(b"Logged Out\n", addr)
+                    except:
+                        self.serverSocket.sendto(b"Logout Failed\n", addr)
+            elif c == "SET_DEGF":
                 self.deg = "F"
-            elif c == "SET_DEGC" :
+            elif c == "SET_DEGC":
                 self.deg = "C"
-            elif c == "SET_DEGK" :
+            elif c == "SET_DEGK":
                 self.deg = "K"
-            elif c == "GET_TEMP" :
+            elif c == "GET_TEMP":
                 self.serverSocket.sendto(b"%f\n" % self.getTemperature(), addr)
             elif c == "UPDATE_TEMP" :
                 self.updateTemperature()
             elif c :
                 self.serverSocket.sendto(b"Invalid Command\n", addr)
 
-    def processOpenCommand(self, cs, addr): #process AUTH and LOGOUT commands
+    def login(self, cs, addr): #process AUTH command
         if cs[0] == "AUTH":
             if cs[1] == "!Q#E%T&U8i6y4r2w" :
                 self.tokens.append(''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)))
@@ -75,13 +81,6 @@ class SmartNetworkThermometer (threading.Thread) :
                 print (self.tokens[-1])
             else:
                 self.serverSocket.sendto(b"Invalid Key\n", addr)
-        elif cs[0] == "LOGOUT":
-            if cs[1] in self.tokens :
-                try:
-                    self.tokens.remove(cs[1])
-                    print("Success")
-                except:
-                    pass
         else : #unknown command
             self.serverSocket.sendto(b"Invalid Command\n", addr)
 
@@ -92,44 +91,23 @@ class SmartNetworkThermometer (threading.Thread) :
                 msg, addr = self.serverSocket.recvfrom(1024)
                 msg = msg.decode("utf-8").strip()
 
-                if ' ' in msg: #expect an AUTH or LOGOUT command
+                if ' ' in msg: #expect an AUTH command
                     cmd = msg.split(' ')
                     if len(cmd) != 2: #if command is unexpected
                         self.serverSocket.sendto(b"Bad Command\n", addr)
                     else:
-                        self.processOpenCommand(cmd, addr)
+                        self.login(cmd, addr)
                 elif ';' in msg: #expect AUTH_TOKEN;chain;commands
                     cmds = msg.split(';')
-                    print(cmds)
 
                     if len(self.tokens) == 0: #if no authentications
                         self.serverSocket.sendto(b"Authenticate First\n", addr)
                     elif cmds[0] in self.tokens: #if valid token
-                        self.processCommands(cmds[1:], addr)
+                        self.processCommands(cmds[0], cmds[1:], addr)
                     else:
                         self.serverSocket.sendto(b"Bad Token\n", addr)
                 else:
-                    self.serverSocket.sendto(b"Bad Command\n", addr)
-
-
-                # if len(cmds) == 1 : # protected commands case
-                #     semi = msg.find(';')
-                #     if semi != -1 : #if we found the semicolon
-                #         if msg[:semi] in self.tokens : #if its a valid token
-                #             self.processCommands(msg[semi+1:], addr)
-                #         else :
-                #             self.serverSocket.sendto(b"Bad Token\n", addr)
-                #     else :
-                #             self.serverSocket.sendto(b"Bad Command\n", addr)
-                # elif len(cmds) == 2 :
-                #     if cmds[0] in self.open_cmds : #if its AUTH or LOGOUT
-                #         self.processCommands(msg, addr) 
-                #     else :
-                #         self.serverSocket.sendto(b"Authenticate First\n", addr)
-                # else :
-                #     # otherwise bad command
-                #     self.serverSocket.sendto(b"Bad Command\n", addr)
-    
+                    self.serverSocket.sendto(b"Bad Command\n", addr)    
             except IOError as e :
                 if e.errno == errno.EWOULDBLOCK :
                     #do nothing
@@ -198,8 +176,6 @@ class SimpleClient :
         if therm.deg == "C" :
             return temp
         if therm.deg == "F" :
-            print("I MADE IT HERE!")
-            print((temp - 32) * 5 / 9)
             return (temp - 32) * 5 / 9
         if therm.deg == "K" :
             return temp - 273

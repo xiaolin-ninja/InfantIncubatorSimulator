@@ -10,6 +10,9 @@ import os
 import errno
 import random
 import string
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class SmartNetworkThermometer (threading.Thread):
     open_cmds = ["AUTH", "LOGOUT"]
@@ -75,7 +78,7 @@ class SmartNetworkThermometer (threading.Thread):
 
     def login(self, cs, addr): #process AUTH command
         if cs[0] == "AUTH":
-            if cs[1] == "!Q#E%T&U8i6y4r2w" :
+            if cs[1] == os.environ.get('SECRET_KEY'):
                 self.tokens.append(''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)))
                 self.serverSocket.sendto(self.tokens[-1].encode("utf-8"), addr)
                 print (self.tokens[-1])

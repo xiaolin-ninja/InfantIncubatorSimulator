@@ -12,7 +12,7 @@ xx910
 
 ### Environment Variables:
 
-`AUTH='!Q#E%T&U8i6y4r2w'`
+`SECRET_KEY='!Q#E%T&U8i6y4r2w'`
 
 ### Generate Certificates:
 
